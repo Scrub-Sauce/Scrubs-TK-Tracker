@@ -1,41 +1,35 @@
 #!/usr/bin/env python3
 
 __author__ = "Kyle Anderson"
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 __email__ = "kyleandersontx@gmail.com"
 __maintainer__ = "Kyle Anderson"
 __status__ = "Alpha"
 
+
 class Teamkill(object):
     # Constructs the Teamkill object
-    def __init__(self, killer, victim, pDate):
-        self.killer = killer
-        self.victim = victim
-        self.pDate = pDate
+    def __init__(self, killer_id, victim_id, datetime):
+        self.__killer_id = killer_id
+        self.__victim_id = victim_id
+        self.__datetime = datetime
 
-    # Gets the Killers name
-    def getKiller(self):
-        return self.killer
-    # Gets the Victims name
-    def getVictim(self):
-        return self.victim
+    def get_killer_id(self):
+        return self.__killer_id
+
+    def get_victim_id(self):
+        return self.__victim_id
 
     # Gets the date of the kill
-    def getPDate(self):
-        return self.pDate
+    def get_occurrence_date(self):
+        return self.__datetime
 
-    # Sets the Killer's name
-    def setKiller(self, killer):
-        self.killer = killer
+    def set_killer_id(self, killer_id):
+        self.__killer_id = killer_id
 
-    # Sets the victims name
-    def setVictim(self, victim):
-        self.victim = victim
+    def set_victim_id(self, victim_id):
+        self.__victim_id = victim_id
 
     # Sets the date of the kill
-    def setPDate(self, pDate):
-        self.pDate = pDate
-
-    # Create a string representation of the teamkill
-    def toString(self):
-        return "\t- {0} killed {1} on {2}".format(self.killer, self.victim,self.pDate)
+    def set_datetime(self, datetime):
+        self.__datetime = datetime

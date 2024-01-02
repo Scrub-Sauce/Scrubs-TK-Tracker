@@ -1,67 +1,58 @@
 #!/usr/bin/env python3
 
 __author__ = "Kyle Anderson"
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 __email__ = "kyleandersontx@gmail.com"
 __maintainer__ = "Kyle Anderson"
 __status__ = "Alpha"
 
-from module.Teamkill import Teamkill
 
 class User(object):
     # Constructs the User object
-    def __init__(self, userID, userName, nickname):
-        self.userID = userID
-        self.userName = userName
-        self.nickname = nickname
-        self.killList = []
+    def __init__(self, auto_id, user_id, username, display_name, kill_count):
+        self.__auto_id = auto_id
+        self.__user_id = user_id
+        self.__username = username
+        self.__display_name = display_name
+        self.__kill_count = kill_count
+
+    def get_auto_id(self):
+        return self.__auto_id
 
     # Gets the UserID
-    def getUserID(self):
-        return self.userID
+    def get_user_id(self):
+        return self.__user_id
 
     # Gets the Username
-    def getUserName(self):
-        return self.userName
+    def get_username(self):
+        return self.__username
 
-    # Gets the Nickname
-    def getNickName(self):
-        return self.nickname
+    # Gets the display_name
+    def get_display_name(self):
+        return self.__display_name
 
-    # Gets the list of past teamkills
-    def getKillList(self):
-        return self.killList
+    def get_kill_count(self):
+        return self.__kill_count
+
+    def set_auto_id(self, auto_id):
+        self.__auto_id = auto_id
 
     # Sets the UserID
-    def setUserID(self, userID):
-        self.userID = userID
+    def set_user_id(self, user_id):
+        self.__user_id = user_id
 
     # Sets the Username
-    def setUserName(self, userName):
-        self.userName = userName
+    def set_username(self, username):
+        self.__username = username
 
-    # Sets the Nickname
-    def setNickname(self, nickname):
-        self.nickname = nickname
+    # Sets the display name
+    def set_display_name(self, display_name):
+        self.__display_name = display_name
 
-    # Sets the list of past kills
-    def setKillList(self, killList):
-        self.killList = killList
-
-    # Adds a Team kill to the list of Team kills
-    def addTK(self, teamkill):
-        self.getKillList().append(teamkill)
-
-    # Checks the User's personal score
-    def userScore(self):
-        userScoreRet = "{0} - {1} has a total of {2} TKs.\n" \
-            .format(self.getUserName(),self.nickname,len(self.killList))
-        return userScoreRet
+    def set_kill_count(self, kill_count):
+        self.__kill_count = kill_count
 
     # Creates a string representation of the User Object
-    def toString(self):
-        user_ret = "{0} - {1} has a total of {2} TKs.\n" \
-            .format(self.getUserName(),self.nickname,len(self.killList))
-        for teamkill in self.killList:
-             user_ret += teamkill.toString() + "\n"
+    def __str__(self):
+        user_ret = f""
         return user_ret
