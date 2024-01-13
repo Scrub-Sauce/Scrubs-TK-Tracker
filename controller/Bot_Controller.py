@@ -47,6 +47,6 @@ def add_teamkill(killer: discord.Member, victim: discord.Member, server: discord
     status_tk = insert_teamkill(tmp_teamkill)
 
     if status_k and status_v and status_s and status_tk:
-        return True
+        return True, teamkill_dt
     else:
-        return False
+        return False, None
