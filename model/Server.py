@@ -1,6 +1,6 @@
 class Server(object):
     def __init__(self, server_name, server_id, owner_id):
-        self.__auto_id = NULL
+        self.__auto_id = None
         self.__server_name = server_name
         self.__server_id = server_id
         self.__owner_id = owner_id
@@ -26,8 +26,8 @@ class Server(object):
     def set_server_id(self, server_id):
         self.__server_id = server_id
 
-    def  set_owner_id(self, owner_id):
+    def set_owner_id(self, owner_id):
         self.__owner_id = owner_id
 
     def __str__(self):
-        return f'Server Name: {self.get_server_name()}\nServer ID: {self.get_server_id()}\nOwner ID: {self.get_owner_id()}\nAuto_id: {self.get_auto_id()}'
+        return f'Auto_id: {self.get_auto_id()}\nServer Name: {self.get_server_name()}\nServer ID: {self.get_server_id()}\nOwner ID: {self.get_owner_id()}\n'

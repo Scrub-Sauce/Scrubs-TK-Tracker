@@ -10,11 +10,15 @@ __status__ = "Alpha"
 class User(object):
     # Constructs the User object
     def __init__(self, user_id, username, display_name, global_name, kill_count):
+        self.__auto_id = None
         self.__display_name = display_name
         self.__global_name = global_name
         self.__user_id = user_id
         self.__username = username
         self.__kill_count = kill_count
+
+    def get_auto_id(self):
+        return self.__auto_id
 
     # Gets the UserID
     def get_user_id(self):
@@ -34,6 +38,9 @@ class User(object):
     def get_kill_count(self):
         return self.__kill_count
 
+    def set_auto_id(self, auto_id):
+        self.__auto_id = auto_id
+
     # Sets the UserID
     def set_user_id(self, user_id):
         self.__user_id = user_id
@@ -52,7 +59,13 @@ class User(object):
     def set_kill_count(self, kill_count):
         self.__kill_count = kill_count
 
+    def add_kill(self):
+        self.set_kill_count(self.get_kill_count() + 1)
+
+    def remove_kill(self):
+        self.set_kill_count(self.get_kill_count() - 1)
+
     # Creates a string representation of the User Object
     def __str__(self):
-        user_ret = f"User ID: {self.get_user_id()}\nUsername: {self.get_username()}\nDisplay Name: {self.get_display_name()}\nGlobal Name: {self.get_global_name()}\nKill Count: {self.get_kill_count()}"
+        user_ret = f"Auto ID: {self.get_auto_id()}\nUser ID: {self.get_user_id()}\nUsername: {self.get_username()}\nDisplay Name: {self.get_display_name()}\nGlobal Name: {self.get_global_name()}\nKill Count: {self.get_kill_count()}"
         return user_ret

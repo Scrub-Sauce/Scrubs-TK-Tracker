@@ -9,10 +9,15 @@ __status__ = "Alpha"
 
 class Teamkill(object):
     # Constructs the Teamkill object
-    def __init__(self, killer_id, victim_id, datetime):
+    def __init__(self, killer_id, victim_id, server_id, datetime):
+        self.__auto_id = None
         self.__killer_id = killer_id
         self.__victim_id = victim_id
+        self.__server_id = server_id
         self.__datetime = datetime
+
+    def get_auto_id(self):
+        return self.__auto_id
 
     def get_killer_id(self):
         return self.__killer_id
@@ -20,9 +25,15 @@ class Teamkill(object):
     def get_victim_id(self):
         return self.__victim_id
 
+    def get_server_id(self):
+        return self.__server_id
+
     # Gets the date of the kill
-    def get_occurrence_date(self):
+    def get_datetime(self):
         return self.__datetime
+
+    def set_auto_id(self, auto_id):
+        self.__auto_id = auto_id
 
     def set_killer_id(self, killer_id):
         self.__killer_id = killer_id
@@ -30,6 +41,12 @@ class Teamkill(object):
     def set_victim_id(self, victim_id):
         self.__victim_id = victim_id
 
+    def set_server_if(self, server_id):
+        self.__server_id = server_id
+
     # Sets the date of the kill
     def set_datetime(self, datetime):
         self.__datetime = datetime
+
+    def __str__(self):
+        return f"Auto_id: {self.get_auto_id()}\nKiller_id: {self.get_killer_id()}\nVictim_id: {self.get_victim_id()}\nServer_id: {self.get_server_id()}\nDateTime: {self.get_datetime()}\n"
