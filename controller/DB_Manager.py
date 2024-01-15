@@ -28,8 +28,10 @@ def connect_to_db():
 
 
 def disconnect_from_db(cursor, conn):
-    cursor.close()
-    conn.close()
+    if conn:
+        conn.close()
+    if cursor:
+        cursor.close()
 
 
 def fetch_user(user_id: int):
@@ -63,6 +65,23 @@ def fetch_server(server_id: int):
 
     except mysql.connector.Error as err:
         print(f'Error encountered fetching Server: {server_id} from DB: {err}')
+        disconnect_from_db(cursor, conn)
+
+
+def fetch_user_server(user_auto_id: int, server_auto_id: int):
+    cursor, conn = connect_to_db()
+    try:
+        query = f"SELECT * FROM `users_servers` WHERE `user_id` = %s AND `server_id` = %s"
+        cursor.execute(query, (user_auto_id, server_auto_id))
+        result = cursor.fetchall()
+        disconnect_from_db(cursor, conn)
+        if result:
+            return True, result[0]
+        else:
+            return False, None
+    except mysql.connector.Error as err:
+        print(f'Error encountered fetching User {user_auto_id} servers: {err}')
+        disconnect_from_db(cursor, conn)
 
 
 def insert_user(user: User):
@@ -71,8 +90,8 @@ def insert_user(user: User):
     try:
         query = (
             "INSERT INTO `users` "
-            "(user_id, username, user_displayname, user_globalname, kill_count) "
-            "VALUES (%s, %s, %s, %s, %s)"
+            "(user_id, username, user_displayname, user_globalname) "
+            "VALUES (%s, %s, %s, %s)"
         )
 
         cursor.execute(
@@ -81,21 +100,20 @@ def insert_user(user: User):
                 user.get_user_id(),
                 user.get_username(),
                 user.get_display_name(),
-                user.get_global_name(),
-                user.get_kill_count(),
+                user.get_global_name()
             ),
         )
-
+        auto_id = cursor.lastrowid
         conn.commit()
         disconnect_from_db(cursor, conn)
-        return True
+        return True, auto_id
 
     except mysql.connector.Error as err:
         print(
             f'Error encountered inserting User: {user.get_username()} - {user.get_user_id()} into `users` table. {err}'
         )
         disconnect_from_db(cursor, conn)
-        return False
+        return False, None
 
 
 def insert_server(server: Server):
@@ -104,11 +122,14 @@ def insert_server(server: Server):
         query = f"INSERT INTO `servers` (`server_name`, `server_id`, `owner_id`) VALUES (%s, %s, %s)"
         cursor.execute(query, (server.get_server_name(), server.get_server_id(), server.get_owner_id()))
         conn.commit()
+        auto_id = cursor.lastrowid
         disconnect_from_db(cursor, conn)
-        return True
+        return True, auto_id
 
     except mysql.connector.Error as err:
-        print(f'Error encountered inserting Server: {server.get_server_name()} - {server.get_server_id()} into `servers` table. {err}')
+        print(
+            f'Error encountered inserting Server: {server.get_server_name()} - {server.get_server_id()} into `servers` table. {err}')
+        return False, None
 
 
 def insert_teamkill(tk: Teamkill):
@@ -117,12 +138,28 @@ def insert_teamkill(tk: Teamkill):
         query = f"INSERT INTO `teamkills` (`killer`, `victim`, `server_id`, `datetime`) VALUES (%s, %s, %s, %s)"
         cursor.execute(query, (tk.get_killer_id(), tk.get_victim_id(), tk.get_server_id(), tk.get_datetime()))
         conn.commit()
+        auto_id = cursor.lastrowid
         disconnect_from_db(cursor, conn)
-        return True
+        return True, auto_id
     except mysql.connector.Error as err:
         print(f"Error encountered inserting teamkill. {err}")
         disconnect_from_db(cursor, conn)
-        return False
+        return False, None
+
+
+def insert_user_server(user_id: int, server_id: int, kill_count: int):
+    cursor, conn = connect_to_db()
+    try:
+        query = f"INSERT INTO `users_servers` (`user_id`, `server_id`, `kill_count`) VALUES (%s, %s, %s)"
+        cursor.execute(query, (user_id, server_id, kill_count))
+        conn.commit()
+        auto_id = cursor.lastrowid
+        disconnect_from_db(cursor, conn)
+        return True, auto_id
+    except mysql.connector.Error as err:
+        print(f"Error Inserting User {user_id} - {server_id} into users_servers Table: {err}")
+        disconnect_from_db(cursor, conn)
+        return False, None
 
 
 def update_user(user: User):
@@ -133,8 +170,7 @@ def update_user(user: User):
             "SET `user_id` = %s, "
             "`username` = %s, "
             "`user_displayname` = %s, "
-            "`user_globalname` = %s, "
-            "`kill_count` = %s "
+            "`user_globalname` = %s "
             "WHERE `auto_id` = %s"
         )
         cursor.execute(
@@ -144,7 +180,6 @@ def update_user(user: User):
                 user.get_username(),
                 user.get_display_name(),
                 user.get_global_name(),
-                user.get_kill_count(),
                 user.get_auto_id(),
             ),
         )
@@ -163,11 +198,27 @@ def update_server(server: Server):
     cursor, conn = connect_to_db()
     try:
         query = "UPDATE `servers` SET `server_name` = %s,`server_id` = %s, `owner_id` = %s WHERE `auto_id` = %s"
-        cursor.execute(query, (server.get_server_name(), server.get_server_id(), server.get_owner_id(), server.get_auto_id()))
+        cursor.execute(query,
+                       (server.get_server_name(), server.get_server_id(), server.get_owner_id(), server.get_auto_id()))
         conn.commit()
         disconnect_from_db(cursor, conn)
         return True
     except mysql.connector.Error as err:
-        print(f'Error encountered updating server: {server.get_server_name()} - {server.get_server_id()} in `servers` table. {err}')
+        print(
+            f'Error encountered updating server: {server.get_server_name()} - {server.get_server_id()} in `servers` table. {err}')
+        disconnect_from_db(cursor, conn)
+        return False
+
+
+def update_user_server(user_id: int, server_id: int, kill_count: int, auto_id: int):
+    cursor, conn = connect_to_db()
+    try:
+        query = "UPDATE `users_servers` SET `user_id` = %s, `server_id` = %s, `kill_count` = %s WHERE `auto_id` = %s"
+        cursor.execute(query, (user_id, server_id, kill_count, auto_id))
+        conn.commit()
+        disconnect_from_db(cursor, conn)
+        return True
+    except mysql.connector.Error as err:
+        print(f'Error encountered updating user {user_id} server {server_id}: {err}')
         disconnect_from_db(cursor, conn)
         return False

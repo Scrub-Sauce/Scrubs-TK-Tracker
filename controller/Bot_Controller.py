@@ -7,46 +7,53 @@ from datetime import datetime
 
 
 def add_teamkill(killer: discord.Member, victim: discord.Member, server: discord.Guild):
-    existing_killer, killer_data = fetch_user(killer.id)
-    existing_victim, victim_data = fetch_user(victim.id)
+    killer_exists, killer_data = fetch_user(killer.id)
+    victim_exists, victim_data = fetch_user(victim.id)
+    server_exists, server_data = fetch_server(server.id)
     teamkill_dt = datetime.now()
 
-    if existing_killer:
-        tmp_killer = User(killer.id, killer.name, killer.display_name, killer.global_name, killer_data[5])
-        tmp_killer.add_kill()
+    tmp_server = Server(server.name, server.id, server.owner_id)
+    if server_exists:
+        tmp_server.set_auto_id(server_data[0])
+        status_s = update_server(tmp_server)
+    else:
+        status_s, s_auto_id = insert_server(tmp_server)
+        tmp_server.set_auto_id(s_auto_id)
+
+    tmp_killer = User(killer.id, killer.name, killer.display_name, killer.global_name)
+
+    if killer_exists:
         tmp_killer.set_auto_id(killer_data[0])
         status_k = update_user(tmp_killer)
     else:
-        tmp_killer = User(killer.id, killer.name, killer.display_name, killer.global_name, 1)
-        insert_user(tmp_killer)
-        status_k, killer_data = fetch_user(tmp_killer.get_user_id())
-        tmp_killer.set_auto_id(killer_data[0])
+        status_k, k_auto_id = insert_user(tmp_killer)
+        tmp_killer.set_auto_id(k_auto_id)
 
-    if existing_victim:
-        tmp_victim = User(victim.id, victim.name, victim.display_name, victim.global_name, victim_data[5])
+    tmp_victim = User(victim.id, victim.name, victim.display_name, victim.global_name)
+
+    if victim_exists:
         tmp_victim.set_auto_id(victim_data[0])
         status_v = update_user(tmp_victim)
     else:
-        tmp_victim = User(victim.id, victim.name, victim.display_name, victim.global_name, 0)
         insert_user(tmp_victim)
-        status_v, victim_data = fetch_user(tmp_victim.get_user_id())
-        tmp_victim.set_auto_id(victim_data[0])
+        status_v, v_auto_id = fetch_user(tmp_victim.get_user_id())
+        tmp_victim.set_auto_id(v_auto_id)
 
-    status_s, server_data = fetch_server(server.id)
-    tmp_server = Server(server.name, server.id, server.owner_id)
+    killer_on_server, killer_server_data = fetch_user_server(tmp_killer.get_auto_id(), tmp_server.get_auto_id())
 
-    if status_s:
-        tmp_server.set_auto_id(server_data[0])
-        update_server(tmp_server)
+    if killer_on_server:
+        tmp_killer.set_kill_count(killer_server_data[3])
+        tmp_killer.add_kill()
+        status_us = update_user_server(tmp_killer.get_auto_id(), tmp_server.get_auto_id(), tmp_killer.get_kill_count(), killer_server_data[0])
     else:
-        insert_server(tmp_server)
-        status_s, server_data = fetch_server(server.id)
-        tmp_server.set_auto_id(server_data[0])
+        tmp_killer.add_kill()
+        status_us, us_auto_id = insert_user_server(tmp_killer.get_auto_id(), tmp_server.get_auto_id(), tmp_killer.get_kill_count())
 
     tmp_teamkill = Teamkill(tmp_killer.get_auto_id(), tmp_victim.get_auto_id(), tmp_server.get_auto_id(), teamkill_dt)
-    status_tk = insert_teamkill(tmp_teamkill)
 
-    if status_k and status_v and status_s and status_tk:
-        return True, teamkill_dt
+    status_tk, tk_auto_id = insert_teamkill(tmp_teamkill)
+    tmp_teamkill.set_auto_id(tk_auto_id)
+    if status_s and status_k and status_v and status_us and status_tk:
+        return True, tmp_teamkill,
     else:
         return False, None

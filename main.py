@@ -9,5 +9,5 @@ __status__ = "Alpha"
 from view.Bot_View import *
 
 if __name__ == "__main__":
-    print("Teamkill-Tracker bot booting up...")
+    print("Scrub's Teamkill Tracker bot booting up...")
     run_bot()

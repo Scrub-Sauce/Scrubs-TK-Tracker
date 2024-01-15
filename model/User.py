@@ -9,13 +9,13 @@ __status__ = "Alpha"
 
 class User(object):
     # Constructs the User object
-    def __init__(self, user_id, username, display_name, global_name, kill_count):
+    def __init__(self, user_id, username, display_name, global_name):
         self.__auto_id = None
         self.__display_name = display_name
         self.__global_name = global_name
         self.__user_id = user_id
         self.__username = username
-        self.__kill_count = kill_count
+        self.__kill_count = 0
 
     def get_auto_id(self):
         return self.__auto_id

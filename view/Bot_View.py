@@ -3,6 +3,7 @@ import discord
 
 import random
 from controller.Bot_Controller import *
+from model.Teamkill import Teamkill
 from dotenv import load_dotenv
 from discord.ext import commands
 
@@ -16,7 +17,7 @@ def run_bot():
     TOKEN = os.getenv('DISCORD_TOKEN')
 
     # Creates the discord Client
-    bot = commands.Bot(command_prefix='$', intents=intents, help_command=None)
+    bot = commands.Bot(command_prefix='#', intents=intents, help_command=None)
 
     # Informs the user when running
     @bot.event
@@ -70,12 +71,12 @@ def run_bot():
         ]
 
         rng = random.randint(0, (len(tk_messages) - 1))
-        status_add_kill, tk_datetime = add_teamkill(killer, victim, ctx.guild)
-
-        tk_occurence = tk_datetime.strftime("%m/%d/%y @ %I:%M %p")
+        status_add_kill, tk_object = add_teamkill(killer, victim, ctx.guild)
+        tk_occurence = tk_object.get_datetime().strftime("%m/%d/%y @ %I:%M %p")
 
         if status_add_kill:
             card = discord.Embed(title='Teamkill Logged!', color=discord.Color.dark_red() ,description=tk_messages[rng][0])
+            card.add_field(name='Teamkill ID', value=tk_object.get_auto_id(), inline=True)
             card.add_field(name="Killer", value=killer.mention, inline=True)
             card.add_field(name="Victim", value=victim.mention, inline=True)
             card.set_image(url=tk_messages[rng][1])
