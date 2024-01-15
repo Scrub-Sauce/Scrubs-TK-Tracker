@@ -35,8 +35,7 @@ def add_teamkill(killer: discord.Member, victim: discord.Member, server: discord
         tmp_victim.set_auto_id(victim_data[0])
         status_v = update_user(tmp_victim)
     else:
-        insert_user(tmp_victim)
-        status_v, v_auto_id = fetch_user(tmp_victim.get_user_id())
+        status_v, v_auto_id = insert_user(tmp_victim)
         tmp_victim.set_auto_id(v_auto_id)
 
     killer_on_server, killer_server_data = fetch_user_server(tmp_killer.get_auto_id(), tmp_server.get_auto_id())
