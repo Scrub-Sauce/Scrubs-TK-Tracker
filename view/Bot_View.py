@@ -1,9 +1,7 @@
 import os
 import discord
 import random
-
 from discord.ext.commands import bot
-
 from controller.Bot_Controller import *
 from model.Teamkill import Teamkill
 from discord import app_commands
@@ -48,7 +46,10 @@ def run_bot():
             )
 
             title = f'{req_obj.guild.name} Top 15 Team Killers'
-            table_width = len(t2a(header=["Rank", "Display Name", "Global Name", "Username", "Kill Count"]).splitlines()[0])
+            table_width = len(t2a(header=["Rank", "Display Name", "Global Name", "Username", "Kill Count"],
+                body=lb_body,
+                first_col_heading=True).splitlines()[0])
+
             padding = (table_width - len(title)) // 2
             centered_title = " " * padding + title
 
