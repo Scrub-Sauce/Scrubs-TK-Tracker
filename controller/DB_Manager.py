@@ -83,6 +83,24 @@ def fetch_user_server(user_auto_id: int, server_auto_id: int):
         print(f'Error encountered fetching User {user_auto_id} servers: {err}')
         disconnect_from_db(cursor, conn)
 
+def fetch_top_15(server_id: int):
+    cursor, conn = connect_to_db()
+    try:
+        query = ("SELECT `user_displayname`, `user_globalname`, `username`, `kill_count` "
+                 "FROM `users` AS u "
+                 "INNER JOIN `users_servers` AS us ON `u`.`auto_id` = `us`.`user_id` "
+                 "INNER JOIN `servers` AS s ON `us`.`server_id` = `s`.`auto_id` "
+                 "WHERE `us`.`server_id` = %s "
+                 "ORDER BY `kill_count` DESC LIMIT 0, 15;"
+                 )
+        cursor.execute(query, (server_id,))
+        result = cursor.fetchall()
+        disconnect_from_db(cursor, conn)
+        return True, result
+    except mysql.connector.Error as err:
+        print(f'Error encountered fetching the top 15 from {server_id}: {err}')
+        return False, None
+
 
 def insert_user(user: User):
     cursor, conn = connect_to_db()
@@ -236,15 +254,15 @@ def delete_tk(kill_id: int):
         print(f'Error encountered deleting Kill ID: {kill_id}. {err}')
         return False
 
-
-def fetch_top_15(server_id: int):
+def delete_servers_tks(server_auto_id):
     cursor, conn = connect_to_db()
     try:
-        query = "SELECT `user_displayname`, `user_globalname`, `username`, `kill_count` FROM `users` AS u INNER JOIN `users_servers` AS us ON `u`.`auto_id` = `us`.`user_id` INNER JOIN `servers` AS s ON `us`.`server_id` = `s`.`auto_id` WHERE `us`.`server_id` = %s ORDER BY `kill_count` DESC LIMIT 0, 15;"
-        cursor.execute(query, (server_id,))
-        result = cursor.fetchall()
+        print(f'{server_auto_id}')
+        query = "DELETE FROM `teamkills` WHERE `server_id` = %s"
+        cursor.execute(query, (server_auto_id,))
+        conn.commit()
         disconnect_from_db(cursor, conn)
-        return True, result
+        return True
     except mysql.connector.Error as err:
-        print(f'Error encountered fetching the top 15 from {server_id}: {err}')
-        return False, None
+        print(f'Error encountered wiping kills for server {server_auto_id}: {err}')
+        return False

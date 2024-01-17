@@ -18,13 +18,36 @@ def run_bot():
     TOKEN = os.getenv('DISCORD_TOKEN')
 
     # Creates the discord Client
-    bot = commands.Bot(command_prefix='/', intents=intents)
+    bot = commands.Bot(command_prefix='/', intents=intents, help_command=None)
 
     # Informs the user when running
     @bot.event
     async def on_ready():
         await bot.tree.sync()
         print(f'{bot.user} has connected to Discord!')
+
+    @bot.tree.command(name='help', description='Displays all available commands and the context in which they can be used.')
+    async def help(req_obj: discord.Interaction):
+        card = discord.Embed(title="Help", description="Here are all available commands and how they can be used.", color=discord.Color.green())
+        card.add_field(name="Add Team kill", value="`/tk` `<@Killer>` `<@Victim>` - Adds a teamkill to the tracker", inline=False)
+        card.add_field(name="Leaderboard Top 15", value="`/top15` - Displays a table of the top 15 team killers on this discord server.", inline=False)
+        card.add_field(name="Remove Team kill", value="`/tk` `<Kill ID>` - Removes the specified team kill from the bot. Requires 'Move Member' permissions.", inline=False)
+        card.add_field(name="Wipe Tracker", value="`/wipe_bot` `<Are You Sure>` - Wipes the team kill tracker of all logged kills. Requires 'Adminstrator' permisions. are_you_sure must be 'Yes' to confirm.", inline=False)
+        card.add_field(name="Help", value="`/help` Displays all available commands and the context in which they can be used. You just used it...", inline=False)
+        await req_obj.response.send_message(embed=card)
+
+    @bot.tree.command(name='wipe_bot', description='Wipes the team kill tracker of all logged kills. Requires Admin Permision. are_you_sure = yes')
+    @app_commands.checks.has_permissions(administrator=True)
+    async def wipe_bot(req_obj: discord.Interaction, are_you_sure: str):
+        if are_you_sure.upper() == 'YES':
+            wipe_status = wipe_server_tks(req_obj.guild)
+            if wipe_status:
+                await req_obj.response.send_message(f'{req_obj.guild.name} Team kills have been sucessfully wiped.')
+            else:
+                await req_obj.response.send_message(f'There was an error wiping {req_obj.guild.name} Team kills.')
+
+        else:
+            await req_obj.response.send_message('Aborting bot wipe...')
 
     @bot.tree.command(name='top15', description='Displays the a leaderboard of the top 15 team killers')
     async def top15(req_obj: discord.Interaction):
@@ -174,8 +197,6 @@ def run_bot():
         else:
             await req_obj.response.send_message(
                 f"Kill ID: {kill_id} encountered an error while attempt to remove from the tracker.")
-
-    # async def history(ctx):
 
     # Runs the discord client
     bot.run(TOKEN)

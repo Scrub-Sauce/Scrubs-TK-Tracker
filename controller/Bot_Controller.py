@@ -68,3 +68,10 @@ def get_leaderboard_data(server: discord.Guild):
     server_auto_id = server_data[0]
     lb_status, leaderboard_data = fetch_top_15(server_auto_id)
     return lb_status, leaderboard_data
+
+def wipe_server_tks(server: discord.Guild):
+    s_status, server_data = fetch_server(server.id)
+    server_auto_id = server_data[0]
+    print(f'{server_auto_id}')
+    wipe_status = delete_servers_tks(server_auto_id)
+    return wipe_status
