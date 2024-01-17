@@ -86,7 +86,7 @@ def fetch_user_server(user_auto_id: int, server_auto_id: int):
 def fetch_top_15(server_id: int):
     cursor, conn = connect_to_db()
     try:
-        query = ("SELECT `user_displayname`, `user_globalname`, `username`, `kill_count` "
+        query = ("SELECT `u`.`user_id`, `kill_count` "
                  "FROM `users` AS u "
                  "INNER JOIN `users_servers` AS us ON `u`.`auto_id` = `us`.`user_id` "
                  "INNER JOIN `servers` AS s ON `us`.`server_id` = `s`.`auto_id` "
@@ -99,6 +99,23 @@ def fetch_top_15(server_id: int):
         return True, result
     except mysql.connector.Error as err:
         print(f'Error encountered fetching the top 15 from {server_id}: {err}')
+        return False, None
+
+
+def fetch_history(killer_auto_id: int, server_auto_id:int):
+    cursor, conn = connect_to_db()
+    try:
+        query = ("SELECT `tk`.`kill_id`, `u`.`user_id`, `tk`.`datetime` FROM `teamkills` AS tk "
+                "INNER JOIN `users` AS u ON `u`.`auto_id` = `tk`.`victim` "
+                "WHERE `tk`.`killer` = %s AND `tk`.`server_id` = %s "
+                "ORDER BY `datetime` ASC;"
+                 )
+        cursor.execute(query, (killer_auto_id, server_auto_id))
+        result = cursor.fetchall()
+        disconnect_from_db(cursor, conn)
+        return True, result
+    except  mysql.connector.Error as err:
+        print(f'Error encountered fetching kill history for killer {killer_auto_id} on server {server_auto_id}. {err}')
         return False, None
 
 

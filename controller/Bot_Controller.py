@@ -69,9 +69,28 @@ def get_leaderboard_data(server: discord.Guild):
     lb_status, leaderboard_data = fetch_top_15(server_auto_id)
     return lb_status, leaderboard_data
 
+
 def wipe_server_tks(server: discord.Guild):
     s_status, server_data = fetch_server(server.id)
     server_auto_id = server_data[0]
     print(f'{server_auto_id}')
     wipe_status = delete_servers_tks(server_auto_id)
     return wipe_status
+
+
+def get_kill_history(killer: discord.Member):
+    u_status, u_data = fetch_user(killer.id)
+    s_status, s_data = fetch_server(killer.guild.id)
+    user_auto_id = u_data[0]
+    server_auto_id = s_data[0]
+    us_status, us_data = fetch_user_server(user_auto_id, server_auto_id)
+    ret_data = [us_data[3]]
+    if u_status and s_status and us_status:
+        h_status, h_data = fetch_history(user_auto_id, server_auto_id)
+        ret_data.append(h_data)
+        if h_status:
+            return True, ret_data
+        else:
+            return False, None
+    else:
+        return False, None

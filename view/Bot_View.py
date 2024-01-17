@@ -26,11 +26,25 @@ def run_bot():
         await bot.tree.sync()
         print(f'{bot.user} has connected to Discord!')
 
+    @bot.tree.command(name='history', description='Displays the kill log for the mentioned player.')
+    async def history(req_obj: discord.Interaction, killer: discord.Member):
+        h_status, h_data = get_kill_history(killer)
+        if h_status:
+            card = discord.Embed(title=f'{killer.display_name} Team Kill History', description=f'The following is the log of all past team kills by {killer.display_name}', color=discord.Color.random())
+            card.add_field(name='Killer', value=f'<@{killer.id}>', inline=True)
+            card.add_field(name='Kill Count', value=f'{h_data[0]}', inline=True)
+            kill_data = h_data[1]
+            for line in kill_data:
+                kill_occur = line[2].strftime("%m/%d/%y @ %I:%M %p")
+                card.add_field(name="", value=f'ID: {line[0]} - <@{line[1]}> - {kill_occur}',inline=False)
+            await req_obj.response.send_message(embed=card)
+
     @bot.tree.command(name='help', description='Displays all available commands and the context in which they can be used.')
     async def help(req_obj: discord.Interaction):
-        card = discord.Embed(title="Help", description="Here are all available commands and how they can be used.", color=discord.Color.green())
+        card = discord.Embed(title="Help", description="Here are all available commands and how they can be used.", color=discord.Colour.random())
         card.add_field(name="Add Team kill", value="`/tk` `<@Killer>` `<@Victim>` - Adds a teamkill to the tracker", inline=False)
         card.add_field(name="Leaderboard Top 15", value="`/top15` - Displays a table of the top 15 team killers on this discord server.", inline=False)
+        card.add_field(name="History", value="`/hisroty` `<@Killer` - Displays the kill log for the mentioned player.", inline=False)
         card.add_field(name="Remove Team kill", value="`/tk` `<Kill ID>` - Removes the specified team kill from the bot. Requires 'Move Member' permissions.", inline=False)
         card.add_field(name="Wipe Tracker", value="`/wipe_bot` `<Are You Sure>` - Wipes the team kill tracker of all logged kills. Requires 'Adminstrator' permisions. are_you_sure must be 'Yes' to confirm.", inline=False)
         card.add_field(name="Help", value="`/help` Displays all available commands and the context in which they can be used. You just used it...", inline=False)
@@ -53,35 +67,10 @@ def run_bot():
     async def top15(req_obj: discord.Interaction):
         lb_status, lb_data = get_leaderboard_data(req_obj.guild)
         if lb_status:
-            lb_body = []
-            for line in lb_data:
-                lb_body_line = []
-                for item in line:
-                    lb_body_line.append(item)
-                lb_body.append(lb_body_line)
-            for i in range(len(lb_body)):
-                lb_body[i].insert(0, i+1)
-
-            top15table = t2a(
-                header=["Rank", "Display Name", "Global Name", "Username", "Kill Count"],
-                body=lb_body,
-                first_col_heading=True
-            )
-
-            title = f'{req_obj.guild.name} Top 15 Team Killers'
-            table_width = len(t2a(header=["Rank", "Display Name", "Global Name", "Username", "Kill Count"],
-                body=lb_body,
-                first_col_heading=True).splitlines()[0])
-
-            padding = (table_width - len(title)) // 2
-            centered_title = " " * padding + title
-
-            ret = '```'
-            ret += f'{centered_title}\n'
-            ret += top15table
-            ret += '```'
-
-            await req_obj.response.send_message(f"{ret}")
+            card = discord.Embed(title=f'{req_obj.guild.name} - Top 15 Team Killers', description='Here are your biggest shitters', color=discord.Colour.random())
+            for i in range(0, len(lb_data)):
+                card.add_field(name='',value=f'{i+1}. <@{lb_data[i][0]}> - Kill Count: {lb_data[i][1]}', inline=False)
+            await req_obj.response.send_message(embed=card)
         else:
             await req_obj.response.send_message(f"Unable to display leaderboard at this time.")
 
@@ -120,9 +109,9 @@ def run_bot():
                 "https://media1.tenor.com/m/o-kpBv0RkcEAAAAC/soul-in-danger.gif"],
             [
                 f'Did {killer.mention} just perform a magic trick? Poof! {victim.mention} disappears in a cloud of bullets.',
-                "https://media1.tenor.com/m/beImWqThNaMAAAAd/gun-shooting.gif"],
+                "https://media1.tenor.com/m/TikTdDzl4zAAAAAC/magic-confetti.gif"],
             [f'Friendly fire: {killer.mention}\'s unique strategy to keep {victim.mention} on their toes.',
-             "https://media1.tenor.com/m/TikTdDzl4zAAAAAC/magic-confetti.gif"],
+             "https://media1.tenor.com/m/beImWqThNaMAAAAd/gun-shooting.gif"],
             [
                 f'In the grand saga of {killer.mention} versus {victim.mention}, today\'s chapter ends with an unexpected twist.',
                 "https://media1.tenor.com/m/JBmnjSa2LJkAAAAC/plot-twist.gif"],
@@ -173,7 +162,7 @@ def run_bot():
         tk_occurence = tk_object.get_datetime().strftime("%m/%d/%y @ %I:%M %p")
 
         if status_add_kill:
-            card = discord.Embed(title='Teamkill Logged!', color=discord.Color.dark_red(),
+            card = discord.Embed(title='Teamkill Logged!', color=discord.Colour.random(),
                                  description=tk_messages[rng][0])
             card.add_field(name='Teamkill ID', value=tk_object.get_auto_id(), inline=True)
             card.add_field(name="Killer", value=killer.mention, inline=True)
