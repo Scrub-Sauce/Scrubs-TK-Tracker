@@ -42,11 +42,11 @@ def add_teamkill(killer: discord.Member, victim: discord.Member, server: discord
 
     if killer_on_server:
         tmp_killer.set_kill_count(killer_server_data[3])
-        tmp_killer.add_kill()
-        status_us = update_user_server(tmp_killer.get_auto_id(), tmp_server.get_auto_id(), tmp_killer.get_kill_count(), killer_server_data[0])
+        status_us = update_user_server(tmp_killer.get_auto_id(), tmp_server.get_auto_id(), tmp_killer.get_kill_count(),
+                                       killer_server_data[0])
     else:
-        tmp_killer.add_kill()
-        status_us, us_auto_id = insert_user_server(tmp_killer.get_auto_id(), tmp_server.get_auto_id(), tmp_killer.get_kill_count())
+        status_us, us_auto_id = insert_user_server(tmp_killer.get_auto_id(), tmp_server.get_auto_id(),
+                                                   tmp_killer.get_kill_count())
 
     tmp_teamkill = Teamkill(tmp_killer.get_auto_id(), tmp_victim.get_auto_id(), tmp_server.get_auto_id(), teamkill_dt)
 
@@ -56,3 +56,15 @@ def add_teamkill(killer: discord.Member, victim: discord.Member, server: discord
         return True, tmp_teamkill,
     else:
         return False, None
+
+
+def remove_tk(kill_id: int):
+    delete_tk_status = delete_tk(kill_id)
+    return delete_tk_status
+
+
+def get_leaderboard_data(server: discord.Guild):
+    s_status, server_data = fetch_server(server.id)
+    server_auto_id = server_data[0]
+    lb_status, leaderboard_data = fetch_top_15(server_auto_id)
+    return lb_status, leaderboard_data
