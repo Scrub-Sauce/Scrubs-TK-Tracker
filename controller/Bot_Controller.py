@@ -4,13 +4,15 @@ from model.Server import Server
 from model.Teamkill import Teamkill
 from controller.DB_Manager import *
 from datetime import datetime
+import pytz
 
 
 def add_teamkill(killer: discord.Member, victim: discord.Member, server: discord.Guild, note: str=None):
     killer_exists, killer_data = fetch_user(killer.id)
     victim_exists, victim_data = fetch_user(victim.id)
     server_exists, server_data = fetch_server(server.id)
-    teamkill_dt = datetime.now()
+    central_tz = pytz.timezone('America/Chicago')
+    teamkill_dt = datetime.now(central_tz)
 
     tmp_server = Server(server.name, server.id, server.owner_id)
     if server_exists:
