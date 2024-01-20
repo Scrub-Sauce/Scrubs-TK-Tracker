@@ -49,6 +49,10 @@ def run_bot():
                                    inline=False)
             await req_obj.response.send_message(embed=card)
 
+    @history.error
+    async def history_error(req_obj: discord.Interaction, error: app_commands.AppCommandError):
+        await req_obj.response.send_message(content=str(error), ephemeral=True)
+
     @bot.tree.command(name='help',
                       description='Displays all available commands and the context in which they can be used.')
     async def help(req_obj: discord.Interaction):
@@ -71,6 +75,10 @@ def run_bot():
                        value="`/help` Displays all available commands and the context in which they can be used. You just used it...",
                        inline=False)
         await req_obj.response.send_message(embed=card)
+
+    @help.error
+    async def help_error(req_obj: discord.Interaction, error: app_commands.AppCommandError):
+        await req_obj.response.send_message(content=str(error), ephemeral=True)
 
     @bot.tree.command(name='wipe_bot',
                       description='Wipes the team kill tracker of all logged kills. Requires Admin Permision. are_you_sure = yes')
@@ -102,6 +110,10 @@ def run_bot():
             await req_obj.response.send_message(embed=card)
         else:
             await req_obj.response.send_message(f"Unable to display leaderboard at this time.")
+
+    @top15.error
+    async def top15_error(req_obj: discord.Interaction, error: app_commands.AppCommandError):
+        await req_obj.response.send_message(content=str(error), ephemeral=True)
 
     @bot.tree.command(name="tk", description="Adds a teamkill to the tracker")
     async def tk(req_obj: discord.Interaction, killer: discord.Member, victim: discord.Member, note: str = None):
@@ -206,6 +218,10 @@ def run_bot():
         else:
             await req_obj.response.send_message(
                 f"There was an error adding the TK please contact the TK Bot Administrator.")
+
+    @tk.error
+    async def tk_error(req_obj: discord.Interaction, error: app_commands.AppCommandError):
+        await req_obj.response.send_message(content=str(error), ephemeral=True)
 
     @bot.tree.command(name='remove_tk',
                       description="Removes the teamkill with the specified ID from the Tracker. Requires: Kick Members permission")
