@@ -15,6 +15,7 @@ class Teamkill(object):
         self.__victim_id = victim_id
         self.__server_id = server_id
         self.__datetime = datetime
+        self.__note = None
 
     def get_auto_id(self):
         return self.__auto_id
@@ -32,6 +33,9 @@ class Teamkill(object):
     def get_datetime(self):
         return self.__datetime
 
+    def get_note(self):
+        return self.__note
+
     def set_auto_id(self, auto_id):
         self.__auto_id = auto_id
 
@@ -48,5 +52,8 @@ class Teamkill(object):
     def set_datetime(self, datetime):
         self.__datetime = datetime
 
+    def set_note(self, note):
+        self.__note = note
+
     def __str__(self):
-        return f"Auto_id: {self.get_auto_id()}\nKiller_id: {self.get_killer_id()}\nVictim_id: {self.get_victim_id()}\nServer_id: {self.get_server_id()}\nDateTime: {self.get_datetime()}\n"
+        return f"Auto_id: {self.get_auto_id()}\nKiller_id: {self.get_killer_id()}\nVictim_id: {self.get_victim_id()}\nServer_id: {self.get_server_id()}\nDateTime: {self.get_datetime()}\nNote: {self.get_note()}\n"

@@ -105,7 +105,7 @@ def fetch_top_15(server_id: int):
 def fetch_history(killer_auto_id: int, server_auto_id:int):
     cursor, conn = connect_to_db()
     try:
-        query = ("SELECT `tk`.`kill_id`, `u`.`user_id`, `tk`.`datetime` FROM `teamkills` AS tk "
+        query = ("SELECT `tk`.`kill_id`, `u`.`user_id`, `tk`.`datetime`, `tk`.`note` FROM `teamkills` AS tk "
                 "INNER JOIN `users` AS u ON `u`.`auto_id` = `tk`.`victim` "
                 "WHERE `tk`.`killer` = %s AND `tk`.`server_id` = %s "
                 "ORDER BY `datetime` ASC;"
@@ -121,7 +121,6 @@ def fetch_history(killer_auto_id: int, server_auto_id:int):
 
 def insert_user(user: User):
     cursor, conn = connect_to_db()
-
     try:
         query = (
             "INSERT INTO `users` "
@@ -170,8 +169,8 @@ def insert_server(server: Server):
 def insert_teamkill(tk: Teamkill):
     cursor, conn = connect_to_db()
     try:
-        query = f"INSERT INTO `teamkills` (`killer`, `victim`, `server_id`, `datetime`) VALUES (%s, %s, %s, %s)"
-        cursor.execute(query, (tk.get_killer_id(), tk.get_victim_id(), tk.get_server_id(), tk.get_datetime()))
+        query = f"INSERT INTO `teamkills` (`killer`, `victim`, `server_id`, `datetime`, `note`) VALUES (%s, %s, %s, %s, %s)"
+        cursor.execute(query, (tk.get_killer_id(), tk.get_victim_id(), tk.get_server_id(), tk.get_datetime(), tk.get_note()))
         conn.commit()
         auto_id = cursor.lastrowid
         disconnect_from_db(cursor, conn)
@@ -283,3 +282,4 @@ def delete_servers_tks(server_auto_id):
     except mysql.connector.Error as err:
         print(f'Error encountered wiping kills for server {server_auto_id}: {err}')
         return False
+

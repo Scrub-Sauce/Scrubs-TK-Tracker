@@ -6,7 +6,7 @@ from controller.DB_Manager import *
 from datetime import datetime
 
 
-def add_teamkill(killer: discord.Member, victim: discord.Member, server: discord.Guild):
+def add_teamkill(killer: discord.Member, victim: discord.Member, server: discord.Guild, note: str=None):
     killer_exists, killer_data = fetch_user(killer.id)
     victim_exists, victim_data = fetch_user(victim.id)
     server_exists, server_data = fetch_server(server.id)
@@ -50,6 +50,10 @@ def add_teamkill(killer: discord.Member, victim: discord.Member, server: discord
 
     tmp_teamkill = Teamkill(tmp_killer.get_auto_id(), tmp_victim.get_auto_id(), tmp_server.get_auto_id(), teamkill_dt)
 
+    if note is not None:
+        tmp_teamkill.set_note(note)
+
+
     status_tk, tk_auto_id = insert_teamkill(tmp_teamkill)
     tmp_teamkill.set_auto_id(tk_auto_id)
     if status_s and status_k and status_v and status_us and status_tk:
@@ -73,7 +77,6 @@ def get_leaderboard_data(server: discord.Guild):
 def wipe_server_tks(server: discord.Guild):
     s_status, server_data = fetch_server(server.id)
     server_auto_id = server_data[0]
-    print(f'{server_auto_id}')
     wipe_status = delete_servers_tks(server_auto_id)
     return wipe_status
 
