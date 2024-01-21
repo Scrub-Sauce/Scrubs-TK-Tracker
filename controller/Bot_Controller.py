@@ -8,63 +8,16 @@ import pytz
 
 
 def add_teamkill(killer: discord.Member, victim: discord.Member, server: discord.Guild, note: str = None):
-    killer_exists, killer_data = fetch_user(killer.id)
-    victim_exists, victim_data = fetch_user(victim.id)
-    server_exists, server_data = fetch_server(server.id)
     central_tz = pytz.timezone('America/Chicago')
     teamkill_dt = datetime.now(central_tz)
 
-    tmp_server = Server(server.name, server.id, server.owner_id)
-    if server_exists:
-        tmp_server.set_auto_id(server_data[0])
-        status_s = update_server(tmp_server)
-    else:
-        status_s, s_auto_id = insert_server(tmp_server)
-        tmp_server.set_auto_id(s_auto_id)
+    status_s, tmp_server = create_server(server)
 
-    tmp_killer = User(killer.id, killer.name, killer.display_name, killer.global_name)
+    status_k, tmp_killer = create_user(killer)
+    status_v, tmp_victim = create_user(victim)
 
-    if killer_exists:
-        tmp_killer.set_auto_id(killer_data[0])
-        status_k = update_user(tmp_killer)
-    else:
-        status_k, k_auto_id = insert_user(tmp_killer)
-        tmp_killer.set_auto_id(k_auto_id)
-
-    tmp_victim = User(victim.id, victim.name, victim.display_name, victim.global_name)
-
-    if victim_exists:
-        tmp_victim.set_auto_id(victim_data[0])
-        status_v = update_user(tmp_victim)
-    else:
-        status_v, v_auto_id = insert_user(tmp_victim)
-        tmp_victim.set_auto_id(v_auto_id)
-
-    killer_on_server, killer_server_data = fetch_user_server(tmp_killer.get_auto_id(), tmp_server.get_auto_id())
-
-    if killer_on_server:
-        tmp_killer.set_kill_count(killer_server_data[3])
-        tmp_killer.set_death_count(killer_server_data[4])
-        k_us_auto_id = killer_server_data[0]
-        k_status_us = update_user_server(tmp_killer.get_auto_id(), tmp_server.get_auto_id(),
-                                         tmp_killer.get_kill_count(), tmp_killer.get_death_count(),
-                                         k_us_auto_id)
-    else:
-        k_status_us, k_us_auto_id = insert_user_server(tmp_killer.get_auto_id(), tmp_server.get_auto_id(),
-                                                       tmp_killer.get_kill_count(), tmp_killer.get_death_count())
-
-    victim_on_server, victim_server_data = fetch_user_server(tmp_victim.get_auto_id(), tmp_server.get_auto_id())
-
-    if victim_on_server:
-        tmp_victim.set_kill_count(victim_server_data[3])
-        tmp_victim.set_death_count(victim_server_data[4])
-        v_us_auto_id = victim_server_data[0]
-        v_status_us = update_user_server(tmp_victim.get_auto_id(), tmp_server.get_auto_id(),
-                                         tmp_victim.get_kill_count(), tmp_victim.get_death_count(),
-                                         v_us_auto_id)
-    else:
-        v_status_us, v_us_auto_id = insert_user_server(tmp_victim.get_auto_id(), tmp_server.get_auto_id(),
-                                                       tmp_victim.get_kill_count(), tmp_victim.get_death_count())
+    k_status_us, k_us_auto_id = create_user_server(tmp_killer, tmp_server)
+    v_status_us, v_us_auto_id = create_user_server(tmp_victim, tmp_server)
 
     tmp_teamkill = Teamkill(tmp_killer.get_auto_id(), tmp_victim.get_auto_id(), tmp_server.get_auto_id(), teamkill_dt)
 
@@ -74,7 +27,7 @@ def add_teamkill(killer: discord.Member, victim: discord.Member, server: discord
     status_tk, tk_auto_id = insert_teamkill(tmp_teamkill)
     tmp_teamkill.set_auto_id(tk_auto_id)
     if status_s and status_k and status_v and k_status_us and v_status_us and status_tk:
-        return True, tmp_teamkill,
+        return True, tmp_teamkill
     else:
         return False, None
 
@@ -132,3 +85,45 @@ def get_death_history(victim: discord.Member):
             return False, None
     else:
         return False, None
+
+
+def create_server(server: discord.Guild):
+    server_exists, server_data = fetch_server(server.id)
+    tmp_server = Server(server.name, server.id, server.owner_id)
+    if server_exists:
+        tmp_server.set_auto_id(server_data[0])
+        status_s = update_server(tmp_server)
+    else:
+        status_s, s_auto_id = insert_server(tmp_server)
+        tmp_server.set_auto_id(s_auto_id)
+
+    return status_s, tmp_server
+
+
+def create_user(user: discord.Member):
+    user_exists, user_data = fetch_user(user.id)
+    tmp_user = User(user.id, user.name, user.display_name, user.global_name)
+    if user_exists:
+        tmp_user.set_auto_id(user_data[0])
+        status_u = update_user(tmp_user)
+    else:
+        status_u, u_auto_id = insert_user(tmp_user)
+        tmp_user.set_auto_id(u_auto_id)
+
+    return status_u, tmp_user
+
+
+def create_user_server(user: User, server: Server):
+    u_server_status, u_data = fetch_user_server(user.get_auto_id(), server.get_auto_id())
+    if u_server_status:
+        user.set_kill_count(u_data[3])
+        user.set_death_count(u_data[4])
+        u_us_auto_id = u_data[0]
+        u_status_us = update_user_server(user.get_auto_id(), server.get_auto_id(),
+                                         user.get_kill_count(), user.get_death_count(),
+                                         u_us_auto_id)
+    else:
+        u_status_us, u_us_auto_id = insert_user_server(user.get_auto_id(), server.get_auto_id(),
+                                                       user.get_kill_count(), user.get_death_count())
+
+    return u_status_us, u_us_auto_id

@@ -83,6 +83,7 @@ def fetch_user_server(user_auto_id: int, server_auto_id: int):
         print(f'Error encountered fetching User {user_auto_id} servers: {err}')
         disconnect_from_db(cursor, conn)
 
+
 def fetch_top_15(server_id: int):
     cursor, conn = connect_to_db()
     try:
@@ -102,35 +103,36 @@ def fetch_top_15(server_id: int):
         return False, None
 
 
-def fetch_kill_history(killer_auto_id: int, server_auto_id:int):
+def fetch_kill_history(killer_auto_id: int, server_auto_id: int):
     cursor, conn = connect_to_db()
     try:
         query = ("SELECT `tk`.`kill_id`, `u`.`user_id`, `tk`.`datetime`, `tk`.`note` FROM `teamkills` AS tk "
-                "INNER JOIN `users` AS u ON `u`.`auto_id` = `tk`.`victim` "
-                "WHERE `tk`.`killer` = %s AND `tk`.`server_id` = %s "
-                "ORDER BY `datetime` ASC;"
+                 "INNER JOIN `users` AS u ON `u`.`auto_id` = `tk`.`victim` "
+                 "WHERE `tk`.`killer` = %s AND `tk`.`server_id` = %s "
+                 "ORDER BY `datetime` ASC;"
                  )
         cursor.execute(query, (killer_auto_id, server_auto_id))
         result = cursor.fetchall()
         disconnect_from_db(cursor, conn)
         return True, result
-    except  mysql.connector.Error as err:
+    except mysql.connector.Error as err:
         print(f'Error encountered fetching kill history for killer {killer_auto_id} on server {server_auto_id}. {err}')
         return False, None
 
-def fetch_death_history(victim_auto_id: int, server_auto_id:int):
+
+def fetch_death_history(victim_auto_id: int, server_auto_id: int):
     cursor, conn = connect_to_db()
     try:
         query = ("SELECT `tk`.`kill_id`, `u`.`user_id`, `tk`.`datetime`, `tk`.`note` FROM `teamkills` AS tk "
-                "INNER JOIN `users` AS u ON `u`.`auto_id` = `tk`.`killer` "
-                "WHERE `tk`.`victim` = %s AND `tk`.`server_id` = %s "
-                "ORDER BY `datetime` ASC;"
+                 "INNER JOIN `users` AS u ON `u`.`auto_id` = `tk`.`killer` "
+                 "WHERE `tk`.`victim` = %s AND `tk`.`server_id` = %s "
+                 "ORDER BY `datetime` ASC;"
                  )
         cursor.execute(query, (victim_auto_id, server_auto_id))
         result = cursor.fetchall()
         disconnect_from_db(cursor, conn)
         return True, result
-    except  mysql.connector.Error as err:
+    except mysql.connector.Error as err:
         print(f'Error encountered fetching kill history for killer {victim_auto_id} on server {server_auto_id}. {err}')
         return False, None
 
@@ -186,7 +188,8 @@ def insert_teamkill(tk: Teamkill):
     cursor, conn = connect_to_db()
     try:
         query = f"INSERT INTO `teamkills` (`killer`, `victim`, `server_id`, `datetime`, `note`) VALUES (%s, %s, %s, %s, %s)"
-        cursor.execute(query, (tk.get_killer_id(), tk.get_victim_id(), tk.get_server_id(), tk.get_datetime(), tk.get_note()))
+        cursor.execute(query,
+                       (tk.get_killer_id(), tk.get_victim_id(), tk.get_server_id(), tk.get_datetime(), tk.get_note()))
         conn.commit()
         auto_id = cursor.lastrowid
         disconnect_from_db(cursor, conn)
@@ -260,7 +263,7 @@ def update_server(server: Server):
         return False
 
 
-def update_user_server(user_id: int, server_id: int, kill_count: int, death_count:int, auto_id: int):
+def update_user_server(user_id: int, server_id: int, kill_count: int, death_count: int, auto_id: int):
     cursor, conn = connect_to_db()
     try:
         query = "UPDATE `users_servers` SET `user_id` = %s, `server_id` = %s, `kill_count` = %s, `death_count` = %s WHERE `auto_id` = %s"
@@ -286,6 +289,7 @@ def delete_tk(kill_id: int):
         print(f'Error encountered deleting Kill ID: {kill_id}. {err}')
         return False
 
+
 def delete_servers_tks(server_auto_id):
     cursor, conn = connect_to_db()
     try:
@@ -298,4 +302,3 @@ def delete_servers_tks(server_auto_id):
     except mysql.connector.Error as err:
         print(f'Error encountered wiping kills for server {server_auto_id}: {err}')
         return False
-

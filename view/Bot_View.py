@@ -19,12 +19,14 @@ def run_bot():
     # Creates the discord Client
     bot = commands.Bot(command_prefix='/', intents=intents, help_command=None)
 
-    # Informs the user when running
+    # Informs the user when running and changes the status
     @bot.event
     async def on_ready():
         await bot.tree.sync()
+        await bot.change_presence(activity=discord.CustomActivity(name=f'Try /help for commands'))
         print(f'{bot.user} has connected to Discord!')
 
+    # History Command
     @bot.tree.command(name='history', description='Displays the kill log for the mentioned player.')
     async def history(req_obj: discord.Interaction, killer: discord.Member):
         k_h_status, k_h_data = get_kill_history(killer)
@@ -67,16 +69,18 @@ def run_bot():
                                    inline=False)
             await req_obj.response.send_message(embed=card)
 
+    # History Error
     @history.error
     async def history_error(req_obj: discord.Interaction, error: app_commands.AppCommandError):
         await req_obj.response.send_message(content=str(error), ephemeral=True)
 
+    # Help Command
     @bot.tree.command(name='help',
                       description='Displays all available commands and the context in which they can be used.')
     async def help(req_obj: discord.Interaction):
         card = discord.Embed(title="Help", description="Here are all available commands and how they can be used.",
                              color=discord.Colour.random())
-        card.add_field(name="Add Team kill", value="`/tk` `<@Killer>` `<@Victim>` - Adds a teamkill to the tracker",
+        card.add_field(name="Add Team kill", value="`/tk` `<@Killer>` `<@Victim>` `[Note]` - Adds a teamkill to the tracker. The note attribute is optional and can be used for explinations",
                        inline=False)
         card.add_field(name="Leaderboard Top 15",
                        value="`/top15` - Displays a table of the top 15 team killers on this discord server.",
@@ -84,7 +88,7 @@ def run_bot():
         card.add_field(name="History", value="`/hisroty` `<@Killer>` - Displays the kill log for the mentioned player.",
                        inline=False)
         card.add_field(name="Remove Team kill",
-                       value="`/tk` `<Kill ID>` - Removes the specified team kill from the bot. Requires 'Move Member' permissions.",
+                       value="`/remove_tk` `<Kill ID>` - Removes the specified team kill from the bot. Requires 'Move Member' permissions.",
                        inline=False)
         card.add_field(name="Wipe Tracker",
                        value="`/wipe_bot` `<Are You Sure>` - Wipes the team kill tracker of all logged kills. Requires 'Adminstrator' permisions. are_you_sure must be 'Yes' to confirm.",
@@ -94,10 +98,12 @@ def run_bot():
                        inline=False)
         await req_obj.response.send_message(embed=card)
 
+    # Help Error
     @help.error
     async def help_error(req_obj: discord.Interaction, error: app_commands.AppCommandError):
         await req_obj.response.send_message(content=str(error), ephemeral=True)
 
+    # Wipe Bot Command
     @bot.tree.command(name='wipe_bot',
                       description='Wipes the team kill tracker of all logged kills. Requires Admin Permision. are_you_sure = yes')
     @app_commands.checks.has_permissions(administrator=True)
@@ -112,10 +118,12 @@ def run_bot():
         else:
             await req_obj.response.send_message('Aborting bot wipe...')
 
+    # Wipe Bot Error
     @wipe_bot.error
     async def wipe_bot_error(req_obj: discord.Interaction, error: app_commands.AppCommandError):
         await req_obj.response.send_message(content=str(error), ephemeral=True)
 
+    # Top15 Command
     @bot.tree.command(name='top15', description='Displays the a leaderboard of the top 15 team killers')
     async def top15(req_obj: discord.Interaction):
         lb_status, lb_data = get_leaderboard_data(req_obj.guild)
@@ -129,10 +137,12 @@ def run_bot():
         else:
             await req_obj.response.send_message(f"Unable to display leaderboard at this time.")
 
+    # Top15 Error
     @top15.error
     async def top15_error(req_obj: discord.Interaction, error: app_commands.AppCommandError):
         await req_obj.response.send_message(content=str(error), ephemeral=True)
 
+    # TK Command
     @bot.tree.command(name="tk", description="Adds a teamkill to the tracker")
     async def tk(req_obj: discord.Interaction, killer: discord.Member, victim: discord.Member, note: str = None):
         tk_messages = [
@@ -237,10 +247,12 @@ def run_bot():
             await req_obj.response.send_message(
                 f"There was an error adding the TK please contact the TK Bot Administrator.")
 
+    # TK Error
     @tk.error
     async def tk_error(req_obj: discord.Interaction, error: app_commands.AppCommandError):
         await req_obj.response.send_message(content=str(error), ephemeral=True)
 
+    # Remove TK Command
     @bot.tree.command(name='remove_tk',
                       description="Removes the teamkill with the specified ID from the Tracker. Requires: Kick Members permission")
     @app_commands.checks.has_permissions(move_members=True)
@@ -252,6 +264,7 @@ def run_bot():
             await req_obj.response.send_message(
                 f"Kill ID: {kill_id} encountered an error while attempt to remove from the tracker.")
 
+    # Remove TK Error
     @remove_tk.error
     async def remove_tk_error(req_obj: discord.Interaction, error: app_commands.AppCommandError):
         await req_obj.response.send_message(content=str(error), ephemeral=True)
