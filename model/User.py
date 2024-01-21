@@ -16,6 +16,7 @@ class User(object):
         self.__user_id = user_id
         self.__username = username
         self.__kill_count = 0
+        self.__death_count = 0
 
     def get_auto_id(self):
         return self.__auto_id
@@ -38,6 +39,9 @@ class User(object):
     def get_kill_count(self):
         return self.__kill_count
 
+    def get_death_count(self):
+        return self.__death_count
+
     def set_auto_id(self, auto_id):
         self.__auto_id = auto_id
 
@@ -59,13 +63,10 @@ class User(object):
     def set_kill_count(self, kill_count):
         self.__kill_count = kill_count
 
-    def add_kill(self):
-        self.set_kill_count(self.get_kill_count() + 1)
-
-    def remove_kill(self):
-        self.set_kill_count(self.get_kill_count() - 1)
+    def set_death_count(self, death_count):
+        self.__death_count = death_count
 
     # Creates a string representation of the User Object
     def __str__(self):
-        user_ret = f"Auto ID: {self.get_auto_id()}\nUser ID: {self.get_user_id()}\nUsername: {self.get_username()}\nDisplay Name: {self.get_display_name()}\nGlobal Name: {self.get_global_name()}\nKill Count: {self.get_kill_count()}"
+        user_ret = f"Auto ID: {self.get_auto_id()}\nUser ID: {self.get_user_id()}\nUsername: {self.get_username()}\nDisplay Name: {self.get_display_name()}\nGlobal Name: {self.get_global_name()}\nKill Count: {self.get_kill_count()}\nDeath Count: {self.get_death_count()}\n"
         return user_ret
