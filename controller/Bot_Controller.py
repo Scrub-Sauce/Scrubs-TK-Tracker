@@ -32,9 +32,15 @@ def add_teamkill(killer: discord.Member, victim: discord.Member, server: discord
         return False, None
 
 
-def remove_tk(kill_id: int):
-    delete_tk_status = delete_tk(kill_id)
-    return delete_tk_status
+def remove_tk_from_log(kill_id: int, server: discord.Guild):
+    status_tk, tk_data = fetch_tk_by_ID(kill_id)
+    status_s, server_data = fetch_server(server.id)
+    if status_tk and tk_data[3] == server_data[0]:
+        delete_tk_status = delete_tk(kill_id)
+        return delete_tk_status
+    else:
+        print(f'Teamkill {kill_id} was not found on {server.name}')
+        return False
 
 
 def get_leaderboard_data(server: discord.Guild):

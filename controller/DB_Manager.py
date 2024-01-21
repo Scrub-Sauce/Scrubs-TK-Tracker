@@ -136,6 +136,18 @@ def fetch_death_history(victim_auto_id: int, server_auto_id: int):
         print(f'Error encountered fetching kill history for killer {victim_auto_id} on server {server_auto_id}. {err}')
         return False, None
 
+def fetch_tk_by_ID(kill_id: int):
+    cursor, conn = connect_to_db()
+    try:
+        query = ("SELECT * FROM `teamkills` WHERE `kill_id` = %s")
+        cursor.execute(query, (kill_id,))
+        result = cursor.fetchall()
+        disconnect_from_db(cursor, conn)
+        return True, result[0]
+    except mysql.connector.Error as err:
+        print(f'Error encountered fetching team kill ID: {kill_id}. {err}')
+        return False, None
+
 
 def insert_user(user: User):
     cursor, conn = connect_to_db()

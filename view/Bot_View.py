@@ -257,7 +257,7 @@ def run_bot():
                       description="Removes the teamkill with the specified ID from the Tracker. Requires: Kick Members permission")
     @app_commands.checks.has_permissions(move_members=True)
     async def remove_tk(req_obj: discord.Interaction, kill_id: int):
-        rm_tk_status = delete_tk(kill_id)
+        rm_tk_status = remove_tk_from_log(kill_id, req_obj.guild)
         if rm_tk_status:
             await req_obj.response.send_message(f"Kill ID: {kill_id} was successfully removed from the tracker.")
         else:
