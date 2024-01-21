@@ -50,6 +50,7 @@ def run_bot():
                 else:
                     card.add_field(name="", value=f'**ID:** {kill_id} - <@{victim_id}> - {kill_occur}',
                                    inline=False)
+            card.add_field(name='----------------------------------------', value='', inline=False)
             card.add_field(name='Death History', value='', inline=False)
             death_data = d_h_data[1]
             for line in death_data:
