@@ -1,7 +1,7 @@
 import os
 import discord
 import random
-from discord.ext.commands import bot, Paginator
+from discord.ext.commands import bot
 from controller.Bot_Controller import *
 from model.Teamkill import Teamkill
 from discord import app_commands
@@ -30,7 +30,10 @@ def run_bot():
     # Bot Invite Command
     @bot.tree.command(name='invite_me', description='Like this bot? Invite it to your Discord!')
     async def invite_me(req_obj: discord.Interaction):
-        card = discord.Embed(title="Invite this bot to your discord!",description='Click the link above to invite me to your discord!', color=discord.Color.random(), url='https://discord.com/api/oauth2/authorize?client_id=1196557331966734366&permissions=1084479764544&scope=bot')
+        card = discord.Embed(title="Invite this bot to your discord!",
+                             description='Click the link above to invite me to your discord!',
+                             color=discord.Color.random(),
+                             url='https://discord.com/api/oauth2/authorize?client_id=1196557331966734366&permissions=1084479764544&scope=bot')
         card.set_thumbnail(url='https://i.imgur.com/ReOfs0G.png')
         await req_obj.response.send_message(embed=card, ephemeral=True)
 
@@ -43,7 +46,8 @@ def run_bot():
     async def report_bug(req_obj: discord.Interaction, command: str, issue: str):
         br_status = create_bug_report(req_obj.user, req_obj.guild, command, issue)
         if br_status:
-            await req_obj.response.send_message('Bug report successfully created. Thank you for your contribution.', ephemeral=True)
+            await req_obj.response.send_message('Bug report successfully created. Thank you for your contribution.',
+                                                ephemeral=True)
         else:
             await req_obj.response.send_message('Error encountered creating the bug report.', ephemeral=True)
 
@@ -66,11 +70,20 @@ def run_bot():
 
     @bot.tree.command(name='bot_info', description='Bot information')
     async def bot_info(req_obj: discord.Interaction):
-        card = discord.Embed(title='Scrub\'s TK Bot Information', description='v1.0.1', color=discord.Color.random())
+        card = discord.Embed(title='Scrub\'s TK Bot Information', description='v1.0.5', color=discord.Color.random())
         card.set_thumbnail(url='https://i.imgur.com/ReOfs0G.png')
         card.add_field(name='Developer', value='Scrub Sauce', inline=True)
-        card.add_field(name='GitHub', value='[GitHub Repo](https://github.com/Scrub-Sauce/Scrubs-TK-Tracker)', inline=True)
-        card.add_field(name='Gratuity', value='Enjoying the bot? Want to show your support, [Buy me a Coffee! :coffee:](https://www.buymeacoffee.com/scrub_sauce)', inline=False)
+        card.add_field(name='GitHub', value='**[GitHub Repo](https://github.com/Scrub-Sauce/Scrubs-TK-Tracker)**',
+                       inline=True)
+        card.add_field(
+            name='Legal',
+            value='**[Terms of Service](https://github.com/Scrub-Sauce/Scrubs-TK-Tracker/blob/main/TERMS_OF_SERVICE.md)** - **[Privacy Policy](https://github.com/Scrub-Sauce/Scrubs-TK-Tracker/blob/main/PRIVACY_POLICY.md)** - **[License](https://github.com/Scrub-Sauce/Scrubs-TK-Tracker/blob/main/LICENSE)**',
+            inline=False)
+
+        card.add_field(
+            name='Gratuity',
+            value='Enjoying the bot? :thumbsup:\nWant to show your support, **[Buy me a Coffee! :coffee:](https://www.buymeacoffee.com/scrub_sauce)**',
+            inline=False)
         await req_obj.response.send_message(embed=card)
 
     @bot_info.error
@@ -131,7 +144,8 @@ def run_bot():
     async def help(req_obj: discord.Interaction):
         card = discord.Embed(title="Help", description="Here are all available commands and how they can be used.",
                              color=discord.Colour.random())
-        card.add_field(name="Add Team kill", value="`/tk` `<@Killer>` `<@Victim>` `[Note]` - Adds a teamkill to the tracker. The note attribute is optional and can be used for explinations",
+        card.add_field(name="Add Team kill",
+                       value="`/tk` `<@Killer>` `<@Victim>` `[Note]` - Adds a teamkill to the tracker. The note attribute is optional and can be used for explinations",
                        inline=False)
         card.add_field(name="Leaderboard Top 15",
                        value="`/leaderboard` or `/top15` - Displays a table of the top 15 team killers on this discord server.",
@@ -142,9 +156,11 @@ def run_bot():
                        inline=False)
         card.add_field(name="Bot Info", value="`/bot_info` - Displays information about the bots development",
                        inline=False)
-        card.add_field(name="Invite Me", value="`/invite_me` - Provides the user with a link to invite this bot to their discords.",
+        card.add_field(name="Invite Me",
+                       value="`/invite_me` - Provides the user with a link to invite this bot to their discords.",
                        inline=False)
-        card.add_field(name="Report Bug", value="`/report_bug` `<Command>` `<Issue>` - Reports bug to the developer. Command should be the exact command that cause the bug, and Issue should explain in detail what happened.",
+        card.add_field(name="Report Bug",
+                       value="`/report_bug` `<Command>` `<Issue>` - Reports bug to the developer. Command should be the exact command that cause the bug, and Issue should explain in detail what happened.",
                        inline=False)
         card.add_field(name="Remove Team kill",
                        value="`/remove_tk` `<Kill ID>` - Removes the specified team kill from the bot. Requires 'Move Member' permissions.",
@@ -182,7 +198,6 @@ def run_bot():
     async def wipe_bot_error(req_obj: discord.Interaction, error: app_commands.AppCommandError):
         await req_obj.response.send_message(content=str(error), ephemeral=True)
 
-
     @bot.tree.command(name='leaderboard', description='Displays the a leaderboard of the top 15 team killers')
     async def leaderboard(req_obj: discord.Interaction):
         lb_status, lb_data = get_leaderboard_data(req_obj.guild)
@@ -190,12 +205,12 @@ def run_bot():
             card = discord.Embed(title=f'{req_obj.guild.name} - Top 15 Team Killers',
                                  description='Here are your biggest shitters', color=discord.Colour.random())
             for i in range(0, len(lb_data)):
-                card.add_field(name='', value=f'**{i + 1}**. <@{lb_data[i][0]}> - **Kill Count:** {lb_data[i][1]} - **Death Count:** {lb_data[i][2]}',
+                card.add_field(name='',
+                               value=f'**{i + 1}**. <@{lb_data[i][0]}> - **Kill Count:** {lb_data[i][1]} - **Death Count:** {lb_data[i][2]}',
                                inline=False)
             await req_obj.response.send_message(embed=card)
         else:
             await req_obj.response.send_message(f"Unable to display leaderboard at this time.")
-
 
     @leaderboard.error
     async def leaderboard_error(req_obj: discord.Interaction, error: app_commands.AppCommandError):
@@ -209,7 +224,8 @@ def run_bot():
             card = discord.Embed(title=f'{req_obj.guild.name} - Top 15 Team Killers',
                                  description='Here are your biggest shitters', color=discord.Colour.random())
             for i in range(0, len(lb_data)):
-                card.add_field(name='', value=f'**{i + 1}**. <@{lb_data[i][0]}> - **Kill Count:** {lb_data[i][1]} - **Death Count:** {lb_data[i][2]}',
+                card.add_field(name='',
+                               value=f'**{i + 1}**. <@{lb_data[i][0]}> - **Kill Count:** {lb_data[i][1]} - **Death Count:** {lb_data[i][2]}',
                                inline=False)
             await req_obj.response.send_message(embed=card)
         else:
@@ -301,7 +317,27 @@ def run_bot():
             [f'{killer.mention} just bulldozed {victim.mention} in true Jibby fashion. He would be so proud.',
              "https://media1.tenor.com/m/z2YFVt1kZPgAAAAd/killdozer-granby.gif"],
             [f'{killer.mention} gave {victim.mention} the Old Yeller treatment.',
-             "https://media1.tenor.com/m/SQjR-ybf24EAAAAC/eat-shit-robot-chicken.gif"]
+             "https://media1.tenor.com/m/SQjR-ybf24EAAAAC/eat-shit-robot-chicken.gif"],
+            [f'{killer.mention} filled {victim.mention} with freedom seeds.',
+             "https://c.tenor.com/gZd47MPpZ0QAAAAC/tenor.gif"],
+            [f'{killer.mention} put {victim.mention} to bed for the raid.',
+             "https://c.tenor.com/IYLXdzA1pgMAAAAC/tenor.gif"],
+            [f'{killer.mention} got a little trigger happy and {victim.mention} was the party girl on the receiving end.',
+             "https://c.tenor.com/dMLeIy2buNQAAAAC/tenor.gif"],
+            [f'{killer.mention} told {victim.mention} to stop resisting. He didn\'t comply...',
+             "https://c.tenor.com/MaJ4iVJSY0gAAAAC/tenor.gif"],
+            [f'{killer.mention} decided to test out his new glock switch. Probably would have been a good idea for {victim.mention} to stay behind him for that.',
+             "https://c.tenor.com/fOtAz-KwXZEAAAAd/tenor.gif"],
+            [f'King {killer.mention} gave {victim.mention} the Anne Boleyn treatment. Ned Stark flinched in his grave',
+             "https://c.tenor.com/9W632RhFORgAAAAC/tenor.gif"],
+            [f'{killer.mention} decided he belonged on the iron throne and {victim.mention} was the main protagonist',
+             "https://c.tenor.com/NIRQWmpfj1UAAAAC/tenor.gif"],
+            [f'{killer.mention} treated {victim.mention} like Theon Greyjoy\'s pecker.',
+             "https://c.tenor.com/i5kWoNobsdAAAAAC/tenor.gif"],
+            [f'Yes, {killer.mention} is as sharp as he looks. He just proved that to {victim.mention}.',
+             "https://c.tenor.com/exBdc7noUSoAAAAd/tenor.gif"],
+            [f'{killer.mention} was a little too amped for the fight and roasted {victim.mention}',
+             "https://c.tenor.com/dqbIYjcy9h4AAAAd/tenor.gif"]
         ]
 
         rng = random.randint(0, (len(tk_messages) - 1))
