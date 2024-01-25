@@ -36,7 +36,7 @@ The Bot may collect certain data, including but not limited to user IDs, game-re
 
 ### 3.2 Privacy Policy
 
-Please review our [Privacy Policy](Privacy_Policy.md) to understand how we collect, use, and disclose information.
+Please review our [Privacy Policy](PRIVACY_POLICY.md) to understand how we collect, use, and disclose information.
 
 ## 4. Termination
 
