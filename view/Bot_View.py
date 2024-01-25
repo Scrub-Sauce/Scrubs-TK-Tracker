@@ -69,8 +69,8 @@ def run_bot():
         card = discord.Embed(title='Scrub\'s TK Bot Information', description='v1.0.1', color=discord.Color.random())
         card.set_thumbnail(url='https://i.imgur.com/ReOfs0G.png')
         card.add_field(name='Developer', value='Scrub Sauce', inline=True)
-        card.add_field(name='GitHub', value='[GitHub Repo](https://github.com/Scrub-Sauce/Teamkill-Tracker)', inline=True)
-        card.add_field(name='Gratuity', value='Enjoying the bot? Want to show your support, [Buy me a :coffee:](https://www.buymeacoffee.com/scrub_sauce)', inline=False)
+        card.add_field(name='GitHub', value='[GitHub Repo](https://github.com/Scrub-Sauce/Scrubs-TK-Tracker)', inline=True)
+        card.add_field(name='Gratuity', value='Enjoying the bot? Want to show your support, [Buy me a Coffee! :coffee:](https://www.buymeacoffee.com/scrub_sauce)', inline=False)
         await req_obj.response.send_message(embed=card)
 
     @bot_info.error
@@ -144,7 +144,7 @@ def run_bot():
                        inline=False)
         card.add_field(name="Invite Me", value="`/invite_me` - Provides the user with a link to invite this bot to their discords.",
                        inline=False)
-        card.add_field(name="Bug Report", value="`/bug_report` `<Command>` `<Issue>` - Reports bug to the developer. Command should be the exact command that cause the bug, and Issue should explain in detail what happened.",
+        card.add_field(name="Report Bug", value="`/report_bug` `<Command>` `<Issue>` - Reports bug to the developer. Command should be the exact command that cause the bug, and Issue should explain in detail what happened.",
                        inline=False)
         card.add_field(name="Remove Team kill",
                        value="`/remove_tk` `<Kill ID>` - Removes the specified team kill from the bot. Requires 'Move Member' permissions.",
