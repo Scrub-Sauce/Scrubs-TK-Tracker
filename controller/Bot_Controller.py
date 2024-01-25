@@ -93,6 +93,16 @@ def get_death_history(victim: discord.Member):
         return False, None
 
 
+def get_server_history(server: discord.Guild):
+    s_status, s_data = fetch_server(server.id)
+    server_auto_id = s_data[0]
+    if s_status:
+        sh_status, sh_data = fetch_server_history(server_auto_id)
+        return sh_status, sh_data
+    else:
+        return False, None
+
+
 def create_server(server: discord.Guild):
     server_exists, server_data = fetch_server(server.id)
     tmp_server = Server(server.name, server.id, server.owner_id)
@@ -133,3 +143,14 @@ def create_user_server(user: User, server: Server):
                                                        user.get_kill_count(), user.get_death_count())
 
     return u_status_us, u_us_auto_id
+
+
+def create_bug_report(user: discord.Member, server: discord.Guild, command: str, issue: str):
+    status_u, tmp_user = create_user(user)
+    status_s, tmp_server = create_server(server)
+    if status_u and status_s:
+        status_br = insert_bug_report(tmp_user.get_auto_id(), tmp_server.get_auto_id(), command, issue)
+        return status_br
+    else:
+        print(f'Error encountered creating Bug report for {tmp_user.get_auto_id()}:{tmp_user.get_username()}.')
+        return False

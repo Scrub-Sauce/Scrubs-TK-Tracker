@@ -1,12 +1,13 @@
 import os
 import discord
 import random
-from discord.ext.commands import bot
+from discord.ext.commands import bot, Paginator
 from controller.Bot_Controller import *
 from model.Teamkill import Teamkill
 from discord import app_commands
 from dotenv import load_dotenv
 from discord.ext import commands
+from view.Server_History_View import Pagination_View
 
 
 def run_bot():
@@ -25,6 +26,56 @@ def run_bot():
         await bot.tree.sync()
         await bot.change_presence(activity=discord.CustomActivity(name=f'Try /help for commands'))
         print(f'{bot.user} has connected to Discord!')
+
+    # Bot Invite Command
+    @bot.tree.command(name='invite_me', description='Like this bot? Invite it to your Discord!')
+    async def invite_me(req_obj: discord.Interaction):
+        card = discord.Embed(title="Invite this bot to your discord!",description='Click the link above to invite me to your discord!', color=discord.Color.random(), url='https://discord.com/api/oauth2/authorize?client_id=1196557331966734366&permissions=1084479764544&scope=bot')
+        card.set_thumbnail(url='https://i.imgur.com/ReOfs0G.png')
+        await req_obj.response.send_message(embed=card, ephemeral=True)
+
+    # Invite Error
+    @invite_me.error
+    async def history_error(req_obj: discord.Interaction, error: app_commands.AppCommandError):
+        await req_obj.response.send_message(content=str(error), ephemeral=True)
+
+    @bot.tree.command(name='report_bug', description='Report a bug to the developer of this bot.')
+    async def report_bug(req_obj: discord.Interaction, command: str, issue: str):
+        br_status = create_bug_report(req_obj.user, req_obj.guild, command, issue)
+        if br_status:
+            await req_obj.response.send_message('Bug report successfully created. Thank you for your contribution.', ephemeral=True)
+        else:
+            await req_obj.response.send_message('Error encountered creating the bug report.', ephemeral=True)
+
+    @report_bug.error
+    async def report_bug_error(req_obj: discord.Interaction, error: app_commands.AppCommandError):
+        await req_obj.response.send_message(content=str(error), ephemeral=True)
+
+    @bot.tree.command(name='server_history')
+    async def server_history(req_obj: discord.Interaction):
+        status_sh, sh_data = get_server_history(req_obj.guild)
+        if status_sh:
+            sh_view = Pagination_View(req_obj, sh_data, req_obj.guild.name, len(sh_data))
+            await sh_view.display_embed()
+        else:
+            await req_obj.response.send_message(content='There is no server history yet.')
+
+    @server_history.error
+    async def server_history_error(req_obj: discord.Interaction, error: app_commands.AppCommandError):
+        await req_obj.response.send_message(content=str(error), ephemeral=True)
+
+    @bot.tree.command(name='bot_info', description='Bot information')
+    async def bot_info(req_obj: discord.Interaction):
+        card = discord.Embed(title='Scrub\'s TK Bot Information', description='v1.0.1', color=discord.Color.random())
+        card.set_thumbnail(url='https://i.imgur.com/ReOfs0G.png')
+        card.add_field(name='Developer', value='Scrub Sauce', inline=True)
+        card.add_field(name='GitHub', value='[GitHub Repo](https://github.com/Scrub-Sauce/Teamkill-Tracker)', inline=True)
+        card.add_field(name='Gratuity', value='Enjoying the bot? Want to show your support, [Buy me a :coffee:](https://www.buymeacoffee.com/scrub_sauce)', inline=False)
+        await req_obj.response.send_message(embed=card)
+
+    @bot_info.error
+    async def bot_info_error(req_obj: discord.Interaction, error: app_commands.AppCommandError):
+        await req_obj.response.send_message(content=str(error), ephemeral=True)
 
     # History Command
     @bot.tree.command(name='history', description='Displays the kill log for the mentioned player.')
@@ -85,7 +136,15 @@ def run_bot():
         card.add_field(name="Leaderboard Top 15",
                        value="`/top15` - Displays a table of the top 15 team killers on this discord server.",
                        inline=False)
-        card.add_field(name="History", value="`/hisroty` `<@Killer>` - Displays the kill log for the mentioned player.",
+        card.add_field(name="History", value="`/history` `<@Killer>` - Displays the kill log for the mentioned player.",
+                       inline=False)
+        card.add_field(name="Server History", value="`/server_history` - Displays all kills logged on this server.",
+                       inline=False)
+        card.add_field(name="Bot Info", value="`/bot_info` - Displays information about the bots development",
+                       inline=False)
+        card.add_field(name="Invite Me", value="`/invite_me` - Provides the user with a link to invite this bot to their discords.",
+                       inline=False)
+        card.add_field(name="Bug Report", value="`/bug_report` `<Command>` `<Issue>` - Reports bug to the developer. Command should be the exact command that cause the bug, and Issue should explain in detail what happened.",
                        inline=False)
         card.add_field(name="Remove Team kill",
                        value="`/remove_tk` `<Kill ID>` - Removes the specified team kill from the bot. Requires 'Move Member' permissions.",

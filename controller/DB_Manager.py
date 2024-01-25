@@ -136,6 +136,21 @@ def fetch_death_history(victim_auto_id: int, server_auto_id: int):
         print(f'Error encountered fetching kill history for killer {victim_auto_id} on server {server_auto_id}. {err}')
         return False, None
 
+def fetch_server_history(server_id: int):
+    cursor, conn = connect_to_db()
+    try:
+        query = ("SELECT `tk`.`kill_id`, `k`.`user_id`, `v`.`user_id`, `tk`.`datetime`, `tk`.`note` FROM `teamkills` AS tk "
+                 "INNER JOIN `users` as k on `k`.`auto_id` = `tk`.`killer` "
+                 "INNER JOIN `users` as v on `v`.`auto_id` = `tk`.`victim`"
+                 "WHERE `tk`.`server_id` = %s;")
+        cursor.execute(query, (server_id,))
+        result = cursor.fetchall()
+        disconnect_from_db(cursor, conn)
+        return True, result
+    except mysql.connector.Error as err:
+        print(f'Error encountered fetching server_history for server {server_id}. Error: {err}')
+        return False, None
+
 def fetch_tk_by_ID(kill_id: int):
     cursor, conn = connect_to_db()
     try:
@@ -305,7 +320,6 @@ def delete_tk(kill_id: int):
 def delete_servers_tks(server_auto_id):
     cursor, conn = connect_to_db()
     try:
-        print(f'{server_auto_id}')
         query = "DELETE FROM `teamkills` WHERE `server_id` = %s"
         cursor.execute(query, (server_auto_id,))
         conn.commit()
@@ -313,4 +327,16 @@ def delete_servers_tks(server_auto_id):
         return True
     except mysql.connector.Error as err:
         print(f'Error encountered wiping kills for server {server_auto_id}: {err}')
+        return False
+
+def insert_bug_report(user_auto_id: int, server_auto_id: int, command: str, issue: str):
+    cursor, conn = connect_to_db()
+    try:
+        query = "INSERT INTO `bug_reports` (`user_auto_id`, `server_auto_id`, `command`, `issue`) VALUES (%s, %s, %s, %s);"
+        cursor.execute(query, (user_auto_id, server_auto_id, command, issue))
+        conn.commit()
+        disconnect_from_db(cursor, conn)
+        return True
+    except mysql.connector.Error as err:
+        print(f'Error encountered inserting bug report for {user_auto_id}: {err}')
         return False
