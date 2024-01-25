@@ -1,6 +1,6 @@
 import discord
 
-class Pagination_View(discord.ui.View):
+class Server_History_View(discord.ui.View):
     def __init__(self, req_obj: discord.Interaction, data, server_name, server_kc):
         super().__init__()
         self.req_obj: discord.Interaction = req_obj
@@ -67,9 +67,9 @@ class Pagination_View(discord.ui.View):
                 card.add_field(name=f"ID: {kill_id} - {kill_datetime}",
                                value=f"<@{killer_id}> brutally murdered <@{victim_id}>.", inline=False)
         if self.button_pressed:
-            card.add_field(name=f"Page {self.current_page}", value="*The interaction didn't fail. It's lying to you...*", inline=False)
+            card.add_field(name=f"Page {self.current_page}/{self.last_page}", value="*The interaction didn't fail. It's lying to you...*", inline=False)
         else:
-            card.add_field(name=f"Page {self.current_page}",
+            card.add_field(name=f"Page {self.current_page}/{self.last_page}",
                            value="", inline=False)
         self.embed = card
         return card

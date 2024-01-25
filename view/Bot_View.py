@@ -7,7 +7,7 @@ from model.Teamkill import Teamkill
 from discord import app_commands
 from dotenv import load_dotenv
 from discord.ext import commands
-from view.Server_History_View import Pagination_View
+from view.Server_History_View import Server_History_View as SHV
 
 
 def run_bot():
@@ -55,7 +55,7 @@ def run_bot():
     async def server_history(req_obj: discord.Interaction):
         status_sh, sh_data = get_server_history(req_obj.guild)
         if status_sh:
-            sh_view = Pagination_View(req_obj, sh_data, req_obj.guild.name, len(sh_data))
+            sh_view = SHV(req_obj, sh_data, req_obj.guild.name, len(sh_data))
             await sh_view.display_embed()
         else:
             await req_obj.response.send_message(content='There is no server history yet.')
@@ -134,7 +134,7 @@ def run_bot():
         card.add_field(name="Add Team kill", value="`/tk` `<@Killer>` `<@Victim>` `[Note]` - Adds a teamkill to the tracker. The note attribute is optional and can be used for explinations",
                        inline=False)
         card.add_field(name="Leaderboard Top 15",
-                       value="`/top15` - Displays a table of the top 15 team killers on this discord server.",
+                       value="`/leaderboard` or `/top15` - Displays a table of the top 15 team killers on this discord server.",
                        inline=False)
         card.add_field(name="History", value="`/history` `<@Killer>` - Displays the kill log for the mentioned player.",
                        inline=False)
@@ -180,6 +180,25 @@ def run_bot():
     # Wipe Bot Error
     @wipe_bot.error
     async def wipe_bot_error(req_obj: discord.Interaction, error: app_commands.AppCommandError):
+        await req_obj.response.send_message(content=str(error), ephemeral=True)
+
+
+    @bot.tree.command(name='leaderboard', description='Displays the a leaderboard of the top 15 team killers')
+    async def leaderboard(req_obj: discord.Interaction):
+        lb_status, lb_data = get_leaderboard_data(req_obj.guild)
+        if lb_status:
+            card = discord.Embed(title=f'{req_obj.guild.name} - Top 15 Team Killers',
+                                 description='Here are your biggest shitters', color=discord.Colour.random())
+            for i in range(0, len(lb_data)):
+                card.add_field(name='', value=f'**{i + 1}**. <@{lb_data[i][0]}> - **Kill Count:** {lb_data[i][1]} - **Death Count:** {lb_data[i][2]}',
+                               inline=False)
+            await req_obj.response.send_message(embed=card)
+        else:
+            await req_obj.response.send_message(f"Unable to display leaderboard at this time.")
+
+
+    @leaderboard.error
+    async def leaderboard_error(req_obj: discord.Interaction, error: app_commands.AppCommandError):
         await req_obj.response.send_message(content=str(error), ephemeral=True)
 
     # Top15 Command
