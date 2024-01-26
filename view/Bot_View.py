@@ -58,7 +58,7 @@ def run_bot():
     @bot.tree.command(name='server_history')
     async def server_history(req_obj: discord.Interaction):
         status_sh, sh_data = get_server_history(req_obj.guild)
-        if status_sh:
+        if status_sh and len(sh_data) > 0:
             sh_view = SHV(req_obj, sh_data, req_obj.guild.name, len(sh_data))
             await sh_view.display_embed()
         else:
