@@ -12,6 +12,9 @@ Scrub's TK Tracker is a Discord bot designed to track team kills in FPS games wi
 - [Contributing](#contributing)
 - [License](#license)
 
+## Try Me
+Invite this bot to your discord [Here](https://discord.com/api/oauth2/authorize?client_id=1196557331966734366&permissions=1084479764544&scope=bot)
+
 ## Commands
 ### Add Team kill
 `/tk <@Killer> <@Victim> [Note]`
