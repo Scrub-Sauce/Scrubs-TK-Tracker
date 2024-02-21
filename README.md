@@ -3,7 +3,7 @@
 Scrub's TK Tracker is a Discord bot designed to track team kills in FPS games within Discord communities. It provides a range of commands to manage and display team kill data.
 
 ## Table of Contents
--[Try Me](#Try%20Me)
+- [Try Me](#Try%20Me)
 - [Commands](#commands)
 - [Installation](#installation)
 - [Dependencies](#dependencies)
